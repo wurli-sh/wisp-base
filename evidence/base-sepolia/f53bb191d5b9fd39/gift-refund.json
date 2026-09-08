@@ -1,0 +1,39 @@
+{
+  "giftId": "8",
+  "asset": "0xB2000000000000000000002247EcF9CA88df03Ad",
+  "amount": "1000000000000000",
+  "sender": "0xFbc83d9aDA8F06242a528b62A63728e1EF7DE066",
+  "events": {
+    "created": {
+      "giftId": "8",
+      "sender": "0xFbc83d9aDA8F06242a528b62A63728e1EF7DE066",
+      "token": "0xB2000000000000000000002247EcF9CA88df03Ad",
+      "amount": "1000000000000000",
+      "unlockAt": "1788898648",
+      "expiresAt": "1788898678"
+    },
+    "refunded": {
+      "giftId": "8",
+      "sender": "0xFbc83d9aDA8F06242a528b62A63728e1EF7DE066"
+    }
+  },
+  "receipts": {
+    "approval": {
+      "transactionHash": "0xcedfde6cd2f141b150a5347992fe3682b774c512f96cb372a8953e0beb0505b1",
+      "blockNumber": "46565179",
+      "status": "success"
+    },
+    "funding": {
+      "transactionHash": "0xfd104d8f2907a19465222958ec143cbefdd374718fff8e8888e4787ea532624e",
+      "blockNumber": "46565182",
+      "status": "success"
+    },
+    "refund": {
+      "transactionHash": "0x68b4d3909de465dc10d8e0862414226b4c3297ca9e6e09cdedfe877e79a7cb88",
+      "blockNumber": "46565197",
+      "status": "success"
+    }
+  },
+  "finalStatus": 3,
+  "escrowLockedAfterSmoke": "0"
+}

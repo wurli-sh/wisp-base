@@ -1,0 +1,53 @@
+{
+  "pass": true,
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "deploymentBlock": 46564333,
+  "confirmedTransactions": 29,
+  "contracts": {
+    "mockUsdc": {
+      "address": "0xbbA4262B5CE51c0f7e24Be1424f235b521E8BF14",
+      "codeHash": "0x9e2c274741765748db21f54afb9d3544a51db4caa0905f58ac8f01af22584062"
+    },
+    "assetRegistry": {
+      "address": "0x136377Da41d876aD60c7d8129b1E6DDF6419e3Bf",
+      "codeHash": "0xdba7cfece3ad4b6e6fb423276abca0ad393ea071be14f540ca0c99f8941b8481"
+    },
+    "giftEscrow": {
+      "address": "0x5B276cc494AF6567Ff70A0AFd3BE65d53C4A4B8A",
+      "codeHash": "0x880519ab7145585ed393de02a3efcd5b441fbae070c04a56b31dca8c006c6bc7"
+    },
+    "demoStockRouter": {
+      "address": "0x68F6385524954811d937ca2AC4d402B9345aC4eC",
+      "codeHash": "0xfca6f932e9469fba11834529d2a012a4da6a0c6ff9c3df6020a548371a6c3c7a"
+    }
+  },
+  "assets": [
+    {
+      "key": "WISPAAPL",
+      "address": "0xB2000000000000000000002247EcF9CA88df03Ad",
+      "codeHash": "0x309b8896ee4c1ff7ec1966155373dee42663b6b40c3fedc70ba501684848d2a3",
+      "routerInventory": "99998987341772151898736",
+      "escrowBalance": "0",
+      "locked": "0"
+    },
+    {
+      "key": "WISPNVDA",
+      "address": "0xB200000000000000000000b7437B8b3496352f03",
+      "codeHash": "0x309b8896ee4c1ff7ec1966155373dee42663b6b40c3fedc70ba501684848d2a3",
+      "routerInventory": "100000000000000000000000",
+      "escrowBalance": "0",
+      "locked": "0"
+    },
+    {
+      "key": "WISPTSLA",
+      "address": "0xB200000000000000000000af0680C5AC4aEee341",
+      "codeHash": "0x309b8896ee4c1ff7ec1966155373dee42663b6b40c3fedc70ba501684848d2a3",
+      "routerInventory": "100000000000000000000000",
+      "escrowBalance": "0",
+      "locked": "0"
+    }
+  ],
+  "manifestHash": "f53bb191d5b9fd39",
+  "auditedAt": "2026-09-08T20:19:49.385Z"
+}

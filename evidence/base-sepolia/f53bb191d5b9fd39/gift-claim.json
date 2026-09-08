@@ -1,0 +1,38 @@
+{
+  "giftId": "7",
+  "asset": "0xB2000000000000000000002247EcF9CA88df03Ad",
+  "amount": "3164556962025316",
+  "recipient": "0xFbc83d9aDA8F06242a528b62A63728e1EF7DE066",
+  "events": {
+    "created": {
+      "giftId": "7",
+      "sender": "0xFbc83d9aDA8F06242a528b62A63728e1EF7DE066",
+      "token": "0xB2000000000000000000002247EcF9CA88df03Ad",
+      "amount": "3164556962025316",
+      "unlockAt": "1788898628",
+      "expiresAt": "1789503428"
+    },
+    "claimed": {
+      "giftId": "7",
+      "recipient": "0xFbc83d9aDA8F06242a528b62A63728e1EF7DE066"
+    }
+  },
+  "receipts": {
+    "approval": {
+      "transactionHash": "0x07ef556006ed95e23a4e0f37bde88fe5bae2d5d5b5f87b803e63d3e12b68cf49",
+      "blockNumber": "46565169",
+      "status": "success"
+    },
+    "funding": {
+      "transactionHash": "0xbf7850a20e968f829d160a7cd59dbe3a8985fa9e22e9290badf9ee9759872a91",
+      "blockNumber": "46565172",
+      "status": "success"
+    },
+    "claim": {
+      "transactionHash": "0x080f9ed65810c77897ab9165aa576ec1989b726a82d445f847330a30ea182ea7",
+      "blockNumber": "46565176",
+      "status": "success"
+    }
+  },
+  "finalStatus": 2
+}
