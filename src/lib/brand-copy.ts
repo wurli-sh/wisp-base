@@ -31,4 +31,4 @@ export const HOW_IT_WORKS_STEPS = [
 ] as const;
 
 /** Base.dev app id — required for domain verification meta tag */
-export const BASE_APP_ID = "6aa03572227c28e4adfe4b7";
+export const BASE_APP_ID = "6aa042f3227c28e4adffe4ed";

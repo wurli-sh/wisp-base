@@ -14,5 +14,5 @@ npm run dev
 Homepage includes:
 
 ```html
-<meta name="base:app_id" content="6aa03572227c28e4adfe4b7" />
+<meta name="base:app_id" content="6aa042f3227c28e4adffe4ed" />
 ```
