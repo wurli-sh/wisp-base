@@ -1,0 +1,21 @@
+{
+  "name": "@wisp/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test src/manifest.test.ts"
+  },
+  "dependencies": {
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "tsx": "4.20.5",
+    "typescript": "5.8.3"
+  }
+}
