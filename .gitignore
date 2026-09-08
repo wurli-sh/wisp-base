@@ -1,0 +1,15 @@
+# Root notes / briefs (keep local only)
+/*.md
+!README.md
+
+# deps / build
+node_modules/
+.next/
+out/
+dist/
+.vercel/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
