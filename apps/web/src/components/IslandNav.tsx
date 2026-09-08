@@ -9,6 +9,7 @@ import { navSpring } from "@/lib/motion";
 const NAV_LINKS = [
   ["/send", "Send"],
   ["/inbox", "Inbox"],
+  ["/faucet", "Faucet"],
   ["/account", "Account"],
 ] as const;
 

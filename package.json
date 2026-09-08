@@ -2,26 +2,36 @@
   "name": "wisp-base",
   "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "tsc -p tsconfig.json --noEmit"
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "npm run dev --workspace @wisp/web",
+    "build": "npm run build --workspace @wisp/web",
+    "start": "npm run start --workspace @wisp/web",
+    "lint": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "check": "node scripts/check.mjs",
+    "shared:test": "npm run test --workspace @wisp/shared",
+    "contracts:fmt:check": "cd contracts && base-forge fmt --check",
+    "contracts:build": "cd contracts && base-forge build",
+    "contracts:test": "cd contracts && base-forge test --no-match-contract 'WispGiftInvariants|BaseSepoliaFork'",
+    "contracts:test:invariant": "cd contracts && base-forge test --match-contract WispGiftInvariants",
+    "contracts:test:fork": "node scripts/run-contract-fork-test.mjs",
+    "audit:phase1": "tsx scripts/audit-phase1.mjs",
+    "deploy:sepolia": "tsx scripts/deploy-sepolia.mjs",
+    "smoke:contracts:sepolia": "tsx scripts/materialize-sepolia-evidence.mjs contracts"
   },
   "dependencies": {
-    "framer-motion": "12.40.0",
-    "lucide-react": "0.484.0",
-    "next": "15.5.21",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "viem": "2.31.7"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "4.0.17",
-    "@types/node": "22.13.10",
-    "@types/react": "19.0.12",
-    "@types/react-dom": "19.0.4",
-    "postcss": "8.5.18",
-    "tailwindcss": "4.0.17",
-    "typescript": "5.8.3"
+    "tsx": "4.20.5"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

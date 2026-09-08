@@ -22,7 +22,7 @@ export const HOW_IT_WORKS_STEPS = [
   },
   {
     title: "They claim on Base.",
-    body: "Inbox or claim link — B20 lands in their wallet.",
+    body: "They open Wisp Inbox, then B20 lands in their wallet.",
   },
   {
     title: "Put it to work.",

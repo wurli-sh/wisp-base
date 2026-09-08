@@ -1,0 +1,13 @@
+import type { NextConfig } from "next";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const configDir = path.dirname(fileURLToPath(import.meta.url));
+
+const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  // Monorepo: pin tracing to the workspace root (wisp-base/), not a parent lockfile.
+  outputFileTracingRoot: path.join(configDir, "../.."),
+};
+
+export default nextConfig;
