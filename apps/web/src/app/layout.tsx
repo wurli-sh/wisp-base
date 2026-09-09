@@ -1,40 +1,24 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Space_Grotesk } from "next/font/google";
+import { GlimmProvider } from "glimm/next";
 import { AppChrome } from "@/components/AppChrome";
+import { Providers } from "@/components/Providers";
 import { BASE_APP_ID, SITE_DESCRIPTION } from "@/lib/brand-copy";
+import { BRAND_GLIMM_SWEEP } from "@/lib/glimmBrand";
 import "./globals.css";
 
-const onest = localFont({
-  src: [
-    {
-      path: "../../public/fonts/Onest-Regular.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Onest-Medium.woff2",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Onest-SemiBold.woff2",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/Onest-Bold.woff2",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-onest",
+/** Self-hosted by Next — preloaded, swap so first paint never waits on the font. */
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
   display: "swap",
   preload: true,
-  adjustFontFallback: "Arial",
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
-  title: "Wisp — Gift Coinbase stocks on Base",
+  title: "Wisp — Gift test stocks on Base",
   description: SITE_DESCRIPTION,
   referrer: "no-referrer",
   other: {
@@ -53,14 +37,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={onest.variable}>
+    <html lang="en" className={spaceGrotesk.variable}>
       <head>
-        {/* Base.dev domain verification (App Router equivalent of next/head meta) */}
         <meta name="base:app_id" content={BASE_APP_ID} />
         <meta name="referrer" content="no-referrer" />
       </head>
-      <body className="font-sans antialiased">
-        <AppChrome>{children}</AppChrome>
+      <body className={`${spaceGrotesk.className} antialiased`}>
+        <GlimmProvider {...BRAND_GLIMM_SWEEP}>
+          <Providers>
+            <AppChrome>{children}</AppChrome>
+          </Providers>
+        </GlimmProvider>
       </body>
     </html>
   );

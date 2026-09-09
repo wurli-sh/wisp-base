@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { HeroSendBox } from "@/components/HeroSendBox";
 import { HowItWorks } from "@/components/HowItWorks";
 import { GoogleIcon, XBrandIcon } from "@/components/icons";
+import { SignInModal } from "@/components/SignInModal";
 import { MotionButton } from "@/components/ui/MotionLink";
 import {
   LANDING_HEADLINE,
@@ -13,19 +14,15 @@ import {
 } from "@/lib/brand-copy";
 
 function HomeContent() {
-  const [busy, setBusy] = useState<"google" | "x" | null>(null);
+  const [signInOpen, setSignInOpen] = useState(false);
   const reduceMotion = useReducedMotion();
-
-  function openInbox(which: "google" | "x") {
-    if (busy) return;
-    setBusy(which);
-    // Auth wiring comes later — route to inbox placeholder for now.
-    window.location.href = "/inbox";
-  }
 
   return (
     <div className="flex flex-col items-center gap-20 pb-24 text-center">
       <div className="flex min-h-[calc(100svh-7rem)] w-full max-w-3xl flex-col justify-center space-y-7">
+        <div className="inline-flex items-center justify-center self-center rounded-md border border-brand-muted bg-brand-mist px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-brand-ink">
+          Base Sepolia · test assets
+        </div>
         <div className="space-y-5">
           <h1 className="text-4xl font-extrabold leading-[0.95] tracking-tighter text-foreground sm:text-7xl">
             <span aria-hidden="true" className="flex flex-col items-center gap-2">
@@ -60,15 +57,11 @@ function HomeContent() {
           <div className="flex flex-col items-center gap-2">
             <p className="text-sm text-muted-foreground">{LANDING_INBOX_PROMPT}</p>
             <div className="flex flex-wrap justify-center gap-2">
-              <MotionButton
-                disabled={busy !== null}
-                onClick={() => openInbox("google")}
-                data-testid="cta-account"
-              >
+              <MotionButton data-testid="cta-account" onClick={() => setSignInOpen(true)}>
                 <GoogleIcon className="h-4 w-4" />
                 Continue with Google
               </MotionButton>
-              <MotionButton disabled={busy !== null} onClick={() => openInbox("x")}>
+              <MotionButton onClick={() => setSignInOpen(true)}>
                 <XBrandIcon className="h-4 w-4" />
                 Continue with X
               </MotionButton>
@@ -78,6 +71,7 @@ function HomeContent() {
       </div>
 
       <HowItWorks />
+      <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
     </div>
   );
 }

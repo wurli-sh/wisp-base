@@ -1,8 +1,11 @@
-export default function InboxPage() {
+import { Suspense } from "react";
+import { InboxPage } from "@/features/inbox/InboxPage";
+import { InboxSkeleton } from "@/components/ui/Skeleton";
+
+export default function Page() {
   return (
-    <div className="mx-auto max-w-lg space-y-3 pt-8 text-center">
-      <h1 className="text-3xl font-bold tracking-tight">Inbox</h1>
-      <p className="text-muted-foreground">Pending Coinbase stock gifts will land here.</p>
-    </div>
+    <Suspense fallback={<InboxSkeleton />}>
+      <InboxPage />
+    </Suspense>
   );
 }

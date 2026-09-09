@@ -18,12 +18,18 @@ export function AppChrome({ children }: { children: ReactNode }) {
         <footer className="relative mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 pb-10 text-sm text-muted-foreground">
           <Link
             href="/"
-            className="flex min-h-10 items-center gap-2 opacity-70 transition-opacity hover:opacity-100"
+            className="flex min-h-10 items-center gap-2 opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <img src="/wisp-logo.svg" alt="" className="h-4 w-auto brightness-0" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/sable-logo.svg" alt="" className="h-4 w-auto" />
             <span className="text-sm font-bold tracking-tight text-foreground">Wisp</span>
           </Link>
-          <span className="text-xs">Coinbase stocks on Base</span>
+          <Link
+            href="/privacy"
+            className="inline-flex min-h-10 items-center px-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            Privacy
+          </Link>
         </footer>
       ) : null}
     </>

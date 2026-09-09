@@ -2,9 +2,9 @@
 
 @theme {
   /* Cobalt is reserved for primary actions and keyboard focus. */
-  --color-brand: #2c5cc5;
-  --color-brand-dark: #244ca6;
-  --color-brand-soft: #e7eeff;
+  --color-brand: #2f6fe3;
+  --color-brand-dark: #255fd0;
+  --color-brand-soft: #e8f0fd;
   --color-brand-muted: #c8d8fb;
   --color-brand-mist: #f3f6ff;
   --color-brand-ink: #203d79;
@@ -54,16 +54,17 @@
   --color-ink: #171a20;
   --color-paper: #ffffff;
 
-  --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-control: 9999px;
-  --radius-surface: 1.75rem;
-  --radius-surface-inner: 1.25rem;
+  --radius-control: 0.5rem;
+  --radius-surface: 0.75rem;
+  --radius-surface-inner: 0.5rem;
 
   --shadow-action:
-    inset 0 1px 0 oklch(1 0 0 / 0.2), inset 0 -1px 0 oklch(0 0 0 / 0.14),
-    0 2px 5px oklch(0.39 0.15 260 / 0.2);
+    inset 0 1px 0 oklch(1 0 0 / 0.35), inset 0 -1px 0 oklch(0 0 0 / 0.12),
+    inset 0 0 0 1px oklch(0 0 0 / 0.06), 0 1px 2px oklch(0 0 0 / 0.08),
+    0 0 14px oklch(0.58 0.18 258 / 0.2);
 
   --shadow-soft:
     inset 0 1px 0 oklch(1 0 0 / 0.9), inset 0 -1px 0 oklch(0 0 0 / 0.04),
@@ -159,6 +160,15 @@ button:not(:disabled):not([data-motion-button]) {
 
 .shadow-action {
   box-shadow: var(--shadow-action);
+}
+
+.pill-gradient {
+  background-image: linear-gradient(
+    to bottom,
+    oklch(1 0 0 / 0.15) 0%,
+    oklch(1 0 0 / 0) 45%,
+    oklch(0 0 0 / 0.08) 100%
+  );
 }
 
 .shadow-soft {

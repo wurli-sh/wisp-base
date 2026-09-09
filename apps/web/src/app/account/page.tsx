@@ -1,8 +1,11 @@
-export default function AccountPage() {
+import { Suspense } from "react";
+import { AccountPage } from "@/features/account/AccountPage";
+import { AccountSkeleton } from "@/components/ui/Skeleton";
+
+export default function Page() {
   return (
-    <div className="mx-auto max-w-lg space-y-3 pt-8 text-center">
-      <h1 className="text-3xl font-bold tracking-tight">Account</h1>
-      <p className="text-muted-foreground">Profile + claim identity binding coming soon.</p>
-    </div>
+    <Suspense fallback={<AccountSkeleton />}>
+      <AccountPage />
+    </Suspense>
   );
 }
