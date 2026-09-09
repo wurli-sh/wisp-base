@@ -170,30 +170,6 @@ function mapCdpAuthError(error: unknown): Error {
   return error instanceof Error ? error : new Error(message || "cdp_auth_failed");
 }
 
-/**
- * The SDK otherwise surfaces a missing Embedded Wallet configuration as a generic
- * fetch error. Check it explicitly so a stale project ID is not mistaken for a
- * domain allowlist problem.
- */
-async function assertCdpProjectConfig(projectId: string): Promise<void> {
-  let response: Response;
-  try {
-    response = await fetch(
-      `https://api.cdp.coinbase.com/platform/v2/embedded-wallet-api/projects/${encodeURIComponent(projectId)}/config`,
-    );
-  } catch (error) {
-    throw mapCdpAuthError(error);
-  }
-
-  if (response.ok) return;
-  const body = await response.json().catch(() => null);
-  const detail =
-    body && typeof body === "object"
-      ? `${String((body as { errorMessage?: unknown }).errorMessage ?? "")} ${String((body as { errorType?: unknown }).errorType ?? "")}`.trim()
-      : "";
-  throw mapCdpAuthError(new Error(detail || `CDP project configuration request failed (${response.status})`));
-}
-
 async function waitForUserOperationTxHash(
   smartAccount: Address,
   userOperationHash: Hex,
@@ -217,12 +193,10 @@ async function waitForUserOperationTxHash(
 }
 
 function OperationsSync({
-  projectId,
   onAddress,
   onOperations,
   onEnsureWallet,
 }: {
-  projectId: string;
   onAddress: (address: Address | null) => void;
   onOperations: (operations: CdpWalletOperations | null) => void;
   onEnsureWallet: (ensure: (() => Promise<Address>) | null) => void;
@@ -238,7 +212,6 @@ function OperationsSync({
   const { sendEvmTransaction } = useSendEvmTransaction();
   const { signEvmTypedData } = useSignEvmTypedData();
   const authInFlight = useRef<Promise<Address> | null>(null);
-  const projectConfigCheck = useRef<Promise<void> | null>(null);
   const isInitializedRef = useRef(isInitialized);
   const isSignedInRef = useRef(isSignedIn);
   const evmAddressRef = useRef(evmAddress);
@@ -371,9 +344,6 @@ function OperationsSync({
     if (authInFlight.current) return authInFlight.current;
 
     const run = (async () => {
-      projectConfigCheck.current ??= assertCdpProjectConfig(projectId);
-      await projectConfigCheck.current;
-
       const started = Date.now();
       while (!isInitializedRef.current) {
         if (Date.now() - started > 15_000) throw new Error("cdp_not_ready");
@@ -452,13 +422,7 @@ function OperationsSync({
     } finally {
       authInFlight.current = null;
     }
-  }, [
-    authenticateWithJWT,
-    createEvmEoaAccount,
-    createEvmSmartAccount,
-    onAddress,
-    projectId,
-  ]);
+  }, [authenticateWithJWT, createEvmEoaAccount, createEvmSmartAccount, onAddress]);
 
   useEffect(() => {
     onEnsureWallet(ensureWallet);
@@ -505,7 +469,6 @@ export function CdpBridge({
       }}
     >
       <OperationsSync
-        projectId={projectId}
         onAddress={onAddress}
         onOperations={onOperations}
         onEnsureWallet={onEnsureWallet}
