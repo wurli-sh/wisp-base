@@ -22,3 +22,6 @@ contracts/out/
 contracts/cache/
 contracts/broadcast/
 .vercel
+
+# Local demo voiceover toolkit (not versioned)
+demo/
