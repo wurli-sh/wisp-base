@@ -117,6 +117,13 @@ function eoaAddressFromUser(user: CdpUserLike): Address | null {
   return null;
 }
 
+function currentAppOrigin(): string {
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+  return "";
+}
+
 function mapCdpAuthError(error: unknown): Error {
   const message = error instanceof Error ? error.message : String(error);
   const extras =
@@ -131,16 +138,25 @@ function mapCdpAuthError(error: unknown): Error {
         ].join(" ")
       : "";
   const blob = `${message} ${extras}`;
+  const origin = currentAppOrigin();
   if (/project config not found/i.test(blob)) {
     return new Error("cdp_project_config_missing");
+  }
+  if (
+    origin &&
+    !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin) &&
+    /(forbidden|unauthorized|blocked|invalid|disallowed).{0,40}origin|origin.{0,40}(not |dis)?allow|cors|access-control|domain.{0,20}(not |dis)?allow|not allowlisted.{0,40}(origin|domain)/i.test(
+      blob,
+    )
+  ) {
+    return new Error(`cdp_origin_blocked:${origin}`);
   }
   if (/method not allowed|errorType.:.not_found|\bnot_found\b/i.test(blob)) {
     return new Error("cdp_method_not_allowed");
   }
   if (/network error|failed to fetch|cors|access-control/i.test(blob)) {
-    const origin = typeof window !== "undefined" ? window.location.origin : "";
     if (origin && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) {
-      return new Error("cdp_origin_blocked");
+      return new Error(`cdp_origin_blocked:${origin}`);
     }
     return new Error("cdp_network_unavailable");
   }
@@ -152,6 +168,30 @@ function mapCdpAuthError(error: unknown): Error {
     return new Error("cdp_auth_failed");
   }
   return error instanceof Error ? error : new Error(message || "cdp_auth_failed");
+}
+
+/**
+ * The SDK otherwise surfaces a missing Embedded Wallet configuration as a generic
+ * fetch error. Check it explicitly so a stale project ID is not mistaken for a
+ * domain allowlist problem.
+ */
+async function assertCdpProjectConfig(projectId: string): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://api.cdp.coinbase.com/platform/v2/embedded-wallet-api/projects/${encodeURIComponent(projectId)}/config`,
+    );
+  } catch (error) {
+    throw mapCdpAuthError(error);
+  }
+
+  if (response.ok) return;
+  const body = await response.json().catch(() => null);
+  const detail =
+    body && typeof body === "object"
+      ? `${String((body as { errorMessage?: unknown }).errorMessage ?? "")} ${String((body as { errorType?: unknown }).errorType ?? "")}`.trim()
+      : "";
+  throw mapCdpAuthError(new Error(detail || `CDP project configuration request failed (${response.status})`));
 }
 
 async function waitForUserOperationTxHash(
@@ -177,10 +217,12 @@ async function waitForUserOperationTxHash(
 }
 
 function OperationsSync({
+  projectId,
   onAddress,
   onOperations,
   onEnsureWallet,
 }: {
+  projectId: string;
   onAddress: (address: Address | null) => void;
   onOperations: (operations: CdpWalletOperations | null) => void;
   onEnsureWallet: (ensure: (() => Promise<Address>) | null) => void;
@@ -196,6 +238,7 @@ function OperationsSync({
   const { sendEvmTransaction } = useSendEvmTransaction();
   const { signEvmTypedData } = useSignEvmTypedData();
   const authInFlight = useRef<Promise<Address> | null>(null);
+  const projectConfigCheck = useRef<Promise<void> | null>(null);
   const isInitializedRef = useRef(isInitialized);
   const isSignedInRef = useRef(isSignedIn);
   const evmAddressRef = useRef(evmAddress);
@@ -328,6 +371,9 @@ function OperationsSync({
     if (authInFlight.current) return authInFlight.current;
 
     const run = (async () => {
+      projectConfigCheck.current ??= assertCdpProjectConfig(projectId);
+      await projectConfigCheck.current;
+
       const started = Date.now();
       while (!isInitializedRef.current) {
         if (Date.now() - started > 15_000) throw new Error("cdp_not_ready");
@@ -406,7 +452,13 @@ function OperationsSync({
     } finally {
       authInFlight.current = null;
     }
-  }, [authenticateWithJWT, createEvmEoaAccount, createEvmSmartAccount, onAddress]);
+  }, [
+    authenticateWithJWT,
+    createEvmEoaAccount,
+    createEvmSmartAccount,
+    onAddress,
+    projectId,
+  ]);
 
   useEffect(() => {
     onEnsureWallet(ensureWallet);
@@ -453,6 +505,7 @@ export function CdpBridge({
       }}
     >
       <OperationsSync
+        projectId={projectId}
         onAddress={onAddress}
         onOperations={onOperations}
         onEnsureWallet={onEnsureWallet}
