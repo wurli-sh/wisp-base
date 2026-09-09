@@ -2,7 +2,7 @@
 
 <!-- TODO: replace banner asset at docs/assets/banner.png -->
 
-[Live demo](https://wisp-base.vercel.app) · [Demo video](https://PLACEHOLDER_DEMO_VIDEO) · [Pitch / launch video](https://PLACEHOLDER_LAUNCH_VIDEO)
+[Live demo](https://wisp-base.vercel.app) · [Demo video](https://PLACEHOLDER_DEMO_VIDEO) 
 
 ## Problem
 
