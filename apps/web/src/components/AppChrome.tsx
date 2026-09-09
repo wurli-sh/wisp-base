@@ -25,10 +25,10 @@ export function AppChrome({ children }: { children: ReactNode }) {
             <span className="text-sm font-bold tracking-tight text-foreground">Wisp</span>
           </Link>
           <Link
-            href="/privacy"
+            href="/how-it-works"
             className="inline-flex min-h-10 items-center px-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            Privacy
+            How it works
           </Link>
         </footer>
       ) : null}

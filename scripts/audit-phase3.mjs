@@ -48,7 +48,7 @@ try {
   run("production build", ["run", "build"]);
   run("desktop/mobile browser tests", ["run", "test:e2e"]);
 
-  const requiredRoutes = ["page.tsx", "send/page.tsx", "inbox/page.tsx", "faucet/page.tsx", "claim/page.tsx", "c/page.tsx", "register/page.tsx", "account/page.tsx", "balance/page.tsx", "status/page.tsx", "privacy/page.tsx", "mainnet-demo/page.tsx", "withdraw/page.tsx"];
+  const requiredRoutes = ["page.tsx", "send/page.tsx", "inbox/page.tsx", "faucet/page.tsx", "claim/page.tsx", "c/page.tsx", "register/page.tsx", "account/page.tsx", "balance/page.tsx", "status/page.tsx", "how-it-works/page.tsx", "mainnet-demo/page.tsx", "withdraw/page.tsx"];
   for (const route of requiredRoutes) {
     if (!existsSync(path.join(web, "app", route))) throw new Error(`missing route:${route}`);
   }

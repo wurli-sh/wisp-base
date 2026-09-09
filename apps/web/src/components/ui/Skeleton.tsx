@@ -387,13 +387,13 @@ export function InboxSkeleton() {
   );
 }
 
-export function PrivacySkeleton() {
+export function HowItWorksSkeleton() {
   return (
     <div
       className="mx-auto w-full max-w-xl space-y-4"
       role="status"
       aria-busy="true"
-      aria-label="Loading privacy"
+      aria-label="Loading how Wisp works"
     >
       <PageHeaderSkeleton titleW="w-32" subW="w-72" />
       <div className="mt-8 space-y-8 text-left">

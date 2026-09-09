@@ -11,7 +11,7 @@ const ROUTES = [
   "/account",
   "/balance",
   "/status",
-  "/privacy",
+  "/how-it-works",
   "/mainnet-demo",
   "/withdraw",
 ] as const;

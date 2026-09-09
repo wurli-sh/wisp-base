@@ -10,7 +10,7 @@ const ALLOWED = new Set([
   "/account",
   "/claim",
   "/c",
-  "/privacy",
+  "/how-it-works",
   "/withdraw",
   "/faucet",
   "/register",
