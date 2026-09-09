@@ -2,20 +2,36 @@
   "name": "wisp-base",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "dev:web": "npm run dev --workspace @wisp/web",
-    "build": "npm run build --workspace @wisp/web",
-    "start": "npm run start --workspace @wisp/web",
-    "lint": "npm run typecheck --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
+    "dev:web": "pnpm --filter @wisp/web dev",
+    "dev:api": "pnpm --filter @wisp/api dev",
+    "build": "pnpm --filter @wisp/web build && pnpm --filter @wisp/api build",
+    "start": "pnpm --filter @wisp/web start",
+    "lint": "pnpm -r --if-present run typecheck",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "test": "pnpm -r --if-present run test",
+    "test:e2e": "pnpm --filter @wisp/web test:e2e",
+    "smoke:local": "pnpm smoke:api",
+    "smoke:sepolia": "pnpm smoke:contracts:sepolia",
     "check": "node scripts/check.mjs",
-    "shared:test": "npm run test --workspace @wisp/shared",
+    "shared:test": "pnpm --filter @wisp/shared test",
+    "api:typecheck": "pnpm --filter @wisp/api typecheck",
+    "api:test": "pnpm --filter @wisp/api test",
+    "api:test:db": "pnpm --filter @wisp/api test:db",
+    "api:openapi": "pnpm --filter @wisp/api openapi",
+    "supabase:start": "pnpm dlx supabase start",
+    "db:reset": "bash scripts/db/reset.sh",
+    "db:migrate": "bash scripts/db/migrate.sh",
+    "smoke:api": "pnpm --filter @wisp/api smoke",
+    "audit:phase2": "node scripts/audit-phase2.mjs",
+    "audit:phase3": "node scripts/audit-phase3.mjs",
     "contracts:fmt:check": "cd contracts && base-forge fmt --check",
     "contracts:build": "cd contracts && base-forge build",
     "contracts:test": "cd contracts && base-forge test --no-match-contract 'WispGiftInvariants|BaseSepoliaFork'",
@@ -26,7 +42,7 @@
     "smoke:contracts:sepolia": "tsx scripts/materialize-sepolia-evidence.mjs contracts"
   },
   "dependencies": {
-    "viem": "2.31.7"
+    "viem": "2.56.3"
   },
   "devDependencies": {
     "tsx": "4.20.5"
