@@ -164,6 +164,16 @@ export function toInboxItem(
   };
 }
 
+/** A self-gift belongs to both inbox and sent projections but is one activity. */
+export function uniqueByGiftId<T extends { id: string }>(items: T[]): T[] {
+  const unique = new Map<string, T>();
+  for (const item of items) {
+    // Callers put incoming first so self-gifts retain their claim-oriented view.
+    if (!unique.has(item.id)) unique.set(item.id, item);
+  }
+  return [...unique.values()];
+}
+
 export type HealthResponse = {
   ok: boolean;
   network?: string;

@@ -11,7 +11,7 @@ import { StockIcon } from "@/components/StockIcon";
 import { Button } from "@/components/ui/Button";
 import { SegmentedTabs } from "@/components/ui/SegmentedTabs";
 import { InboxTableRowsSkeleton, InboxMobileRowsSkeleton } from "@/components/ui/Skeleton";
-import { apiFetch, toInboxItem, type ApiGift, type InboxItem } from "@/lib/api/client";
+import { apiFetch, toInboxItem, uniqueByGiftId, type ApiGift, type InboxItem } from "@/lib/api/client";
 import { getAccessToken } from "@/lib/auth";
 import { baseScanTx, formatStockAmount, formatUsdcRaw } from "@/lib/format/amount";
 import { stockBySymbol, STOCKS } from "@/lib/stocks";
@@ -59,12 +59,13 @@ export function InboxPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    return items.filter((item) => {
+    const visible = items.filter((item) => {
       const terminal = ["claimed", "refunded", "failed"].includes(item.status);
       if (tab === "history") return terminal;
       if (tab === "sent") return item.direction === "sent" && !terminal;
       return item.direction === "incoming" && !terminal;
     });
+    return tab === "history" ? uniqueByGiftId(visible) : visible;
   }, [items, tab]);
 
   if (!signedIn) {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { apiFetch, toInboxItem, type ApiGift } from "./client";
+import { apiFetch, toInboxItem, uniqueByGiftId, type ApiGift } from "./client";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -57,5 +57,18 @@ describe("gift projection mapping", () => {
       onchainGiftId: "9",
       tokenSymbol: "wAAPL",
     });
+  });
+
+  it("renders a self-gift once in consolidated history", () => {
+    const rows = uniqueByGiftId([
+      { id: "gift-1", direction: "incoming" },
+      { id: "gift-1", direction: "sent" },
+      { id: "gift-2", direction: "sent" },
+    ]);
+
+    expect(rows).toEqual([
+      { id: "gift-1", direction: "incoming" },
+      { id: "gift-2", direction: "sent" },
+    ]);
   });
 });

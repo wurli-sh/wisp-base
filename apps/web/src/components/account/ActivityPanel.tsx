@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { apiFetch, type ApiGift } from "@/lib/api/client";
+import { apiFetch, uniqueByGiftId, type ApiGift } from "@/lib/api/client";
 import { getAccessToken } from "@/lib/auth";
 import { userFacingError } from "@/lib/errors";
 
@@ -21,10 +21,10 @@ export function ActivityPanel() {
           "/v1/activity",
           { token },
         );
-        setItems([
+        setItems(uniqueByGiftId([
           ...data.incoming.map((gift) => ({ ...gift, direction: "incoming" as const })),
           ...data.sent.map((gift) => ({ ...gift, direction: "sent" as const })),
-        ].sort((a, b) => Date.parse(b.createdAt ?? "") - Date.parse(a.createdAt ?? "")));
+        ]).sort((a, b) => Date.parse(b.createdAt ?? "") - Date.parse(a.createdAt ?? "")));
       } catch (error) {
         setItems([]);
         toast.error(userFacingError(error, "Could not load activity"), { id: "activity-load" });
