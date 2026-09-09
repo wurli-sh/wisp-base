@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: wisp-base-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /v1/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_CHAIN_ID
+        value: "84532"
+      - key: DEPLOYMENT_MANIFEST_PATH
+        value: /app/deployments/base-sepolia.json
+      - key: RUN_INDEXER
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+      - key: API_ORIGIN
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: NEXT_PUBLIC_APP_ORIGIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: IDENTITY_LOOKUP_KEY
+        sync: false
+      - key: DESCRIPTOR_SIGNING_KEY
+        sync: false
+      - key: NEXT_PUBLIC_RPC_URL
+        sync: false
+      - key: BASE_SEPOLIA_RPC_URL
+        sync: false
+      - key: DEPLOYER_PRIVATE_KEY
+        sync: false
+      - key: CLAIM_AUTHORIZER_PRIVATE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false

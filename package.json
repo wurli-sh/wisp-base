@@ -32,6 +32,7 @@
     "smoke:api": "pnpm --filter @wisp/api smoke",
     "audit:phase2": "node scripts/audit-phase2.mjs",
     "audit:phase3": "node scripts/audit-phase3.mjs",
+    "deploy:env": "node scripts/deploy/sync-production-env.mjs",
     "contracts:fmt:check": "cd contracts && base-forge fmt --check",
     "contracts:build": "cd contracts && base-forge build",
     "contracts:test": "cd contracts && base-forge test --no-match-contract 'WispGiftInvariants|BaseSepoliaFork'",

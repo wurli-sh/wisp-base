@@ -120,6 +120,13 @@ export function InboxPage() {
           <>
             <div className="hidden md:block">
               <table className="w-full table-fixed text-left text-sm">
+                <colgroup>
+                  <col className="w-[22%]" />
+                  <col className="w-[18%]" />
+                  <col className="w-[14%]" />
+                  <col className="w-[24%]" />
+                  <col className="w-[22%]" />
+                </colgroup>
                 <thead className="border-b border-border/60 bg-brand-mist/50 text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
                     <th className="px-4 py-2.5">Stock</th>
@@ -165,24 +172,24 @@ function GiftRow({ item, desktop, onRefunded }: { item: InboxItem; desktop?: boo
 
   if (desktop) {
     return (
-      <tr>
-        <td className="px-4 py-3.5">
+      <tr className="align-middle">
+        <td className="px-4 py-3">
           <div className="flex items-center gap-2">
             <StockIcon stock={stock} size="sm" />
-            <div>
+            <div className="min-w-0">
               <p className="font-semibold">{formatRawStock(item.stockAmount)} {stock.symbol}</p>
               <p className="text-xs text-muted-foreground">~${formatRawUsdc(item.usdcAmount)} at send</p>
             </div>
           </div>
         </td>
-        <td className="px-4 py-3.5 text-sm">{sender}</td>
-        <td className="px-4 py-3.5">
+        <td className="px-4 py-3 text-sm">{sender}</td>
+        <td className="px-4 py-3">
           <StatusPill status={item.status} />
         </td>
-        <td className="px-4 py-3.5 text-xs text-muted-foreground">
+        <td className="px-4 py-3 text-xs text-muted-foreground">
           {item.unlockAt ? `Unlock ${new Date(item.unlockAt).toLocaleString()}` : "—"}
         </td>
-        <td className="px-4 py-3.5 text-right">
+        <td className="px-4 py-3 text-right">
           <RowActions item={item} claimHref={claimHref} onRefunded={onRefunded} />
         </td>
       </tr>
@@ -248,23 +255,37 @@ function RowActions({ item, claimHref, onRefunded }: { item: InboxItem; claimHre
     }
   }
   return (
-    <div className="flex flex-wrap justify-end gap-2">
+    <div className="inline-flex flex-wrap items-center justify-start gap-x-3 gap-y-2 md:flex-nowrap md:justify-end">
       {item.fundedTxHash ? (
-        <a className="text-xs font-semibold text-brand underline" href={baseScanTx(item.fundedTxHash)} target="_blank" rel="noreferrer">
+        <a
+          className="inline-flex h-8 shrink-0 items-center text-xs font-semibold leading-none text-brand underline underline-offset-2"
+          href={baseScanTx(item.fundedTxHash)}
+          target="_blank"
+          rel="noreferrer"
+        >
           BaseScan
         </a>
       ) : null}
       {item.direction === "incoming" && ["funded", "delivered", "claimable", "locked"].includes(item.status) ? (
-        <Button href={claimHref} size="sm">
+        <Button href={claimHref} size="sm" className="!min-h-8 h-8 shrink-0 px-3 py-0">
           Claim
         </Button>
       ) : null}
       {item.direction === "sent" && item.status === "refundable" ? (
-        <Button size="sm" variant="secondary" disabled={refunding} onClick={() => void refund()}>
+        <Button
+          size="sm"
+          variant="secondary"
+          className="!min-h-8 h-8 shrink-0 px-3 py-0"
+          disabled={refunding}
+          onClick={() => void refund()}
+        >
           {refunding ? "Refunding…" : "Refund"}
         </Button>
       ) : null}
-      <Link href={`/claim?gift=${item.id}`} className="text-xs font-semibold text-muted-foreground underline">
+      <Link
+        href={`/claim?gift=${item.id}`}
+        className="inline-flex h-8 shrink-0 items-center text-xs font-semibold leading-none text-muted-foreground underline underline-offset-2"
+      >
         View
       </Link>
     </div>
