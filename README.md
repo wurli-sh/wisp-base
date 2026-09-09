@@ -2,7 +2,7 @@
 
 <!-- TODO: replace banner asset at docs/assets/banner.png -->
 
-[Live demo](https://PLACEHOLDER_LIVE_DEMO) · [Demo video](https://PLACEHOLDER_DEMO_VIDEO) · [Pitch / launch video](https://PLACEHOLDER_LAUNCH_VIDEO)
+[Live demo](https://wisp-base.vercel.app) · [Demo video](https://PLACEHOLDER_DEMO_VIDEO) · [Pitch / launch video](https://PLACEHOLDER_LAUNCH_VIDEO)
 
 ## Problem
 
@@ -30,8 +30,8 @@ or mainnet securities.
 
 | Resource | Value |
 | -------- | ----- |
-| Frontend | [PLACEHOLDER_FRONTEND](https://PLACEHOLDER_FRONTEND) — `/` · `/send` · `/inbox` · `/faucet` · `/account` · `/claim` · `/how-it-works` |
-| API | [PLACEHOLDER_API](https://PLACEHOLDER_API) |
+| Frontend | [wisp-base.vercel.app](https://wisp-base.vercel.app) — `/` · `/send` · `/inbox` · `/faucet` · `/account` · `/claim` · `/how-it-works` |
+| API | [wisp-base-api.onrender.com](https://wisp-base-api.onrender.com) |
 | Settlement network | Base Sepolia (`84532`) |
 | Explorer | [BaseScan Sepolia](https://sepolia.basescan.org) |
 | MockUSDC (tUSDC) | [`0xbbA4…BF14`](https://sepolia.basescan.org/address/0xbbA4262B5CE51c0f7e24Be1424f235b521E8BF14) |
@@ -197,8 +197,8 @@ Supabase, and Base RPC. Indexer runs in-process when `RUN_INDEXER=true`.
 
 ```bash
 pnpm deploy:env -- --dry-run \
-  --web-origin https://PLACEHOLDER_FRONTEND \
-  --api-origin https://PLACEHOLDER_API
+  --web-origin https://wisp-base.vercel.app \
+  --api-origin https://wisp-base-api.onrender.com
 
 pnpm deploy:env
 git push origin main
