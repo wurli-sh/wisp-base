@@ -1,0 +1,18 @@
+{
+  "ok": true,
+  "at": "2026-09-09T02:43:43.657Z",
+  "chainId": 84532,
+  "aliceProfileId": "cb9644dd-f640-461e-8422-54f594c8e3ca",
+  "bobProfileId": "2ee93f8a-c9e4-4ed3-9cd0-7e146fc7860e",
+  "giftId": "8b6834c2-8821-45a8-a00b-e14c1ba2916e",
+  "bobClaimAuthorization": true,
+  "aliceClaimRejected": true,
+  "claimAuth": {
+    "giftId": "1788921821483378688",
+    "recipient": "0x446b0c7C1E487c9817EbE3d0780f91972fF2B2cC",
+    "deadline": 1788922122,
+    "signature": "[REDACTED]"
+  },
+  "notifications": "configured",
+  "cdp": "configured"
+}

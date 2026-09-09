@@ -3,7 +3,7 @@
   "network": "base-sepolia",
   "chainId": 84532,
   "deploymentBlock": 46564333,
-  "confirmedTransactions": 0,
+  "confirmedTransactions": 29,
   "contracts": {
     "mockUsdc": {
       "address": "0xbbA4262B5CE51c0f7e24Be1424f235b521E8BF14",
@@ -27,7 +27,7 @@
       "key": "WISPAAPL",
       "address": "0xB2000000000000000000002247EcF9CA88df03Ad",
       "codeHash": "0x309b8896ee4c1ff7ec1966155373dee42663b6b40c3fedc70ba501684848d2a3",
-      "routerInventory": "99998990506329113924052",
+      "routerInventory": "99998984177215189873420",
       "escrowBalance": "0",
       "locked": "0"
     },
