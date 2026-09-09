@@ -1,5 +1,5 @@
 export const LANDING_HEADLINE = [
-  "Gift test stocks.",
+  "Gift stocks.",
   "To people, not addresses.",
 ] as const;
 
