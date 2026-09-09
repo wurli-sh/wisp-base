@@ -28,6 +28,17 @@ type Props = {
   embedded?: boolean;
 };
 
+type ClaimPhase =
+  | "idle"
+  | "preparing_wallet"
+  | "authorizing"
+  | "submitting"
+  | "confirming"
+  | "syncing"
+  | "refunding"
+  | "refund_confirming"
+  | "refund_syncing";
+
 export function ClaimView({ giftId, embedded }: Props) {
   const wallet = useWispWallet();
   const [signedIn, setSignedIn] = useState(false);
@@ -38,9 +49,11 @@ export function ClaimView({ giftId, embedded }: Props) {
   const [txHash, setTxHash] = useState<Hash | null>(null);
   const [done, setDone] = useState(false);
   const [completion, setCompletion] = useState<"claimed" | "refunded" | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState<ClaimPhase>("idle");
   const [now, setNow] = useState(() => Date.now());
   const operationRef = useRef(false);
+  const busy = phase !== "idle";
+
   useEffect(() => {
     void (async () => {
       const token = await getAccessToken();
@@ -73,7 +86,7 @@ export function ClaimView({ giftId, embedded }: Props) {
   async function claim() {
     if (!giftId || !gift || operationRef.current) return;
     operationRef.current = true;
-    setBusy(true);
+    setPhase("preparing_wallet");
     try {
       const token = await getAccessToken();
       if (!token) throw new Error("unauthorized");
@@ -82,6 +95,7 @@ export function ClaimView({ giftId, embedded }: Props) {
       const { giftEscrow } = contractAddresses(manifest);
       let hash: Hash | null = null;
       for (let attempt = 0; attempt < 2 && !hash; attempt += 1) {
+        setPhase("authorizing");
         const auth = await apiFetch<{ giftId: string; deadline: number; signature: string }>(
           `/v1/gifts/${giftId}/claim-authorization`,
           { token, method: "POST" },
@@ -105,6 +119,7 @@ export function ClaimView({ giftId, embedded }: Props) {
         if (Number(onchain[3]) > Math.floor(Date.now() / 1000)) throw new Error("gift_locked");
         if (Number(onchain[4]) <= Math.floor(Date.now() / 1000)) throw new Error("gift_expired");
         try {
+          setPhase("submitting");
           await publicClient.simulateContract({ address: giftEscrow, abi: escrowAbi, functionName: "claim", args: [onchainId, address, deadline, signature], account: address });
           const data = encodeFunctionData({ abi: escrowAbi, functionName: "claim", args: [onchainId, address, deadline, signature] });
           hash = await wallet.sendTransaction({ to: giftEscrow, data });
@@ -114,8 +129,10 @@ export function ClaimView({ giftId, embedded }: Props) {
         }
       }
       if (!hash) throw new Error("claim_authorization_expired");
+      setPhase("confirming");
       await wallet.waitForReceipt(hash);
       setTxHash(hash);
+      setPhase("syncing");
       let indexed = false;
       for (let attempt = 0; attempt < 30; attempt += 1) {
         const projection = await apiFetch<{ gift: ApiGift }>(`/v1/gifts/${giftId}`, { token });
@@ -135,26 +152,29 @@ export function ClaimView({ giftId, embedded }: Props) {
       toast.error(userFacingError(e, "Claim failed"));
     } finally {
       operationRef.current = false;
-      setBusy(false);
+      setPhase("idle");
     }
   }
 
   async function refund() {
     if (!gift?.onchainGiftId || operationRef.current) return;
     operationRef.current = true;
-    setBusy(true);
+    setPhase("preparing_wallet");
     try {
       const address = await ensureBoundWallet(wallet);
       const manifest = await loadDeployment();
       const { giftEscrow } = contractAddresses(manifest);
       const onchainId = BigInt(gift.onchainGiftId);
+      setPhase("refunding");
       await publicClient.simulateContract({ address: giftEscrow, abi: escrowAbi, functionName: "refund", args: [onchainId], account: address });
       const data = encodeFunctionData({ abi: escrowAbi, functionName: "refund", args: [onchainId] });
       const hash = await wallet.sendTransaction({ to: giftEscrow, data });
+      setPhase("refund_confirming");
       await wallet.waitForReceipt(hash);
       setTxHash(hash);
       const token = await getAccessToken();
       if (token) {
+        setPhase("refund_syncing");
         for (let attempt = 0; attempt < 20; attempt += 1) {
           const projection = await apiFetch<{ gift: ApiGift }>(`/v1/gifts/${gift.id}`, { token });
           if (projection.gift.state === "refunded") {
@@ -171,7 +191,7 @@ export function ClaimView({ giftId, embedded }: Props) {
       toast.error(userFacingError(error, "Refund failed"));
     } finally {
       operationRef.current = false;
-      setBusy(false);
+      setPhase("idle");
     }
   }
 
@@ -203,6 +223,17 @@ export function ClaimView({ giftId, embedded }: Props) {
     && !expired
     && ["funded", "delivered", "claimable"].includes(gift.state);
   const sender = gift.anonymousSender ? "Anonymous gift" : gift.senderDisplayName ?? "Someone";
+  const statusLabel = giftCardStatus({
+    phase,
+    completion,
+    locked,
+    expired,
+    giftState: gift.state,
+  });
+  const claimButtonLabel = locked
+    ? `Unlocks in ${formatCountdown(unlockMs - now)}`
+    : phaseButtonLabel(phase, "Claim to wallet");
+  const refundButtonLabel = phaseButtonLabel(phase, "Refund to sender wallet");
 
   return (
     <div className="space-y-6">
@@ -212,7 +243,7 @@ export function ClaimView({ giftId, embedded }: Props) {
         usdLabel={`$${formatUsdcRaw(BigInt(gift.usdcAmount))}`}
         senderLabel={sender}
         message={gift.message}
-        status={completion ?? (locked ? "locked" : gift.state)}
+        status={statusLabel}
         footer={
           <div className="flex flex-col gap-2">
             {!done && claimable ? (
@@ -223,12 +254,12 @@ export function ClaimView({ giftId, embedded }: Props) {
                   disabled={busy || Boolean(locked)}
                   onClick={() => void claim()}
                 >
-                  {locked ? `Unlocks in ${formatCountdown(unlockMs - now)}` : busy ? "Claiming…" : "Claim to wallet"}
+                  {claimButtonLabel}
                 </Button>
               </>
             ) : !done && canRefund && gift.state === "refundable" ? (
               <Button className="w-full" disabled={busy} onClick={() => void refund()}>
-                {busy ? "Refunding…" : "Refund to sender wallet"}
+                {refundButtonLabel}
               </Button>
             ) : done ? (
               <>
@@ -259,6 +290,67 @@ export function ClaimView({ giftId, embedded }: Props) {
       ) : null}
     </div>
   );
+}
+
+function giftCardStatus(params: {
+  phase: ClaimPhase;
+  completion: "claimed" | "refunded" | null;
+  locked: boolean;
+  expired: boolean;
+  giftState: string;
+}): string {
+  const { phase, completion, locked, expired, giftState } = params;
+  switch (phase) {
+    case "preparing_wallet":
+      return "Preparing";
+    case "authorizing":
+      return "Authorizing";
+    case "submitting":
+      return "Submitting";
+    case "confirming":
+      return "Confirming";
+    case "syncing":
+      return "Syncing";
+    case "refunding":
+      return "Refunding";
+    case "refund_confirming":
+      return "Confirming";
+    case "refund_syncing":
+      return "Syncing";
+    case "idle":
+      break;
+  }
+  if (completion === "claimed" || giftState === "claimed") return "Claimed";
+  if (completion === "refunded" || giftState === "refunded") return "Refunded";
+  if (giftState === "failed") return "Failed";
+  if (giftState === "refundable") return "Refundable";
+  if (locked) return "Locked";
+  if (expired || giftState === "expired") return "Expired";
+  if (["funded", "delivered", "claimable"].includes(giftState)) return "Claimable";
+  return giftState.replaceAll("_", " ");
+}
+
+function phaseButtonLabel(phase: ClaimPhase, idleLabel: string): string {
+  switch (phase) {
+    case "preparing_wallet":
+      return "Preparing wallet…";
+    case "authorizing":
+      return "Getting authorization…";
+    case "submitting":
+      return "Submitting claim…";
+    case "confirming":
+      return "Confirming on Base…";
+    case "syncing":
+      return "Syncing Inbox…";
+    case "refunding":
+      return "Submitting refund…";
+    case "refund_confirming":
+      return "Confirming refund…";
+    case "refund_syncing":
+      return "Syncing Inbox…";
+    case "idle":
+      return idleLabel;
+  }
 }
 
 function formatCountdown(ms: number): string {

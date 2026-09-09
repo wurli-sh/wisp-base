@@ -65,7 +65,7 @@ export function GiftCard({
                 </div>
               </div>
               {status ? (
-                <span className="inline-flex max-w-[10.5rem] shrink-0 items-center justify-center rounded-md border border-white/25 bg-white/20 px-2.5 py-1.5 text-center text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-white">
+                <span className="inline-flex max-w-[11.5rem] shrink-0 items-center justify-center rounded-md border border-white/25 bg-white/20 px-2.5 py-1.5 text-center text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-white">
                   {status}
                 </span>
               ) : null}
