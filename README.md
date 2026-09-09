@@ -1,8 +1,6 @@
 <img src="docs/assets/banner.png" width="100%" alt="Wisp — gift test stocks on Base to a handle or email" />
 
-<!-- TODO: replace banner asset at docs/assets/banner.png -->
-
-[Live demo](https://wisp-base.vercel.app) · [Demo video](https://PLACEHOLDER_DEMO_VIDEO) 
+[Live demo](https://wisp-base.vercel.app) · [Demo video](https://youtu.be/-tLZ6CwKW84) · [Launch video](https://youtu.be/D0sz2X8mmdc) 
 
 ## Problem
 
