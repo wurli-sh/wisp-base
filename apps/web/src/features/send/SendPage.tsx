@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Droplets } from "lucide-react";
+import type { Address } from "viem";
 import { toast } from "sonner";
 import { PageShell } from "@/components/PageShell";
 import { RecipientInput, type RecipientStatus } from "@/components/RecipientInput";
@@ -13,8 +16,15 @@ import { SegmentedTabs } from "@/components/ui/SegmentedTabs";
 import { TextShimmer } from "@/components/ui/TextShimmer";
 import { ClaimView } from "@/components/claim/ClaimView";
 import { apiFetch } from "@/lib/api/client";
-import { getAccessToken } from "@/lib/auth";
+import { fetchMe, getAccessToken } from "@/lib/auth";
+import {
+  contractAddresses,
+  loadDeployment,
+  mockUsdcAbi,
+  publicClient,
+} from "@/lib/chain";
 import { userFacingError } from "@/lib/errors";
+import { formatUsdcRaw } from "@/lib/format/amount";
 import {
   formatStockAmount,
   formatUsdFromE6,
@@ -24,12 +34,20 @@ import {
   type StockKey,
 } from "@/lib/stocks";
 import { parseRecipient } from "@/lib/recipient";
+import { useWispWallet } from "@/lib/wallet";
 import { SEND_PROGRESS_STAGES } from "./sendReducer";
 import { useSendController } from "./useSendController";
+
+type TusdcChip = {
+  connected: boolean;
+  loading: boolean;
+  balance: string | null;
+};
 
 export function SendPage() {
   const router = useRouter();
   const search = useSearchParams();
+  const wallet = useWispWallet();
   const tab = search.get("tab") === "claim" ? "claim" : "send";
   const giftId = search.get("gift") ?? undefined;
   const prefillTo = search.get("to") ?? "";
@@ -44,11 +62,78 @@ export function SendPage() {
   const [anonymous, setAnonymous] = useState(false);
   const [expiryDays, setExpiryDays] = useState(7);
   const [unlockHours, setUnlockHours] = useState(0);
+  const [boundAddress, setBoundAddress] = useState<Address | null>(null);
+  const [tusdc, setTusdc] = useState<TusdcChip>({
+    connected: false,
+    loading: false,
+    balance: null,
+  });
   const { state, send } = useSendController();
+
+  const balanceAddress = (wallet.address ?? boundAddress) as Address | null;
+
+  const refreshTusdc = useCallback(async (address: Address) => {
+    const manifest = await loadDeployment();
+    const { mockUsdc } = contractAddresses(manifest);
+    const bal = await publicClient.readContract({
+      address: mockUsdc,
+      abi: mockUsdcAbi,
+      functionName: "balanceOf",
+      args: [address],
+    });
+    return formatUsdcRaw(bal);
+  }, []);
 
   useEffect(() => {
     void getAccessToken().then((tok) => setSignedIn(Boolean(tok)));
   }, []);
+
+  useEffect(() => {
+    if (!signedIn) {
+      setBoundAddress(null);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      const me = await fetchMe();
+      if (cancelled || !me.ok) return;
+      const next = me.data.wallet?.address;
+      setBoundAddress(next ? (next as Address) : null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [signedIn]);
+
+  useEffect(() => {
+    if (!balanceAddress) {
+      setTusdc({ connected: false, loading: false, balance: null });
+      return;
+    }
+    let cancelled = false;
+    setTusdc((prev) => ({
+      connected: true,
+      loading: true,
+      balance: prev.connected ? prev.balance : null,
+    }));
+    void (async () => {
+      try {
+        const balance = await refreshTusdc(balanceAddress);
+        if (!cancelled) setTusdc({ connected: true, loading: false, balance });
+      } catch {
+        if (!cancelled) {
+          setTusdc((prev) => ({
+            connected: true,
+            loading: false,
+            balance: prev.balance,
+          }));
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [balanceAddress, refreshTusdc]);
 
   useEffect(() => {
     const parsed = parseRecipient(recipient);
@@ -118,6 +203,15 @@ export function SendPage() {
         anonymousSender: anonymous,
       });
       toast.success("Gift sent");
+      const address = wallet.address ?? boundAddress;
+      if (address) {
+        try {
+          const balance = await refreshTusdc(address);
+          setTusdc({ connected: true, loading: false, balance });
+        } catch {
+          // Keep the last known chip balance if the post-send refresh fails.
+        }
+      }
     } catch (e) {
       const msg = userFacingError(e, "Could not send gift");
       toast.error(msg);
@@ -130,7 +224,7 @@ export function SendPage() {
       subtitle="Gift a Wisp test stock on Base Sepolia to an email, @handle, or Basename."
       maxWidth="md"
     >
-      <div className="mb-6 flex justify-center">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <SegmentedTabs
           layoutId="send-claim"
           ariaLabel="Send or claim"
@@ -149,6 +243,7 @@ export function SendPage() {
             { value: "claim", label: "Claim" },
           ]}
         />
+        <AvailableTusdc chip={tusdc} />
       </div>
 
       {tab === "claim" ? (
@@ -265,5 +360,38 @@ export function SendPage() {
 
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} onSignedIn={() => setSignedIn(true)} />
     </PageShell>
+  );
+}
+
+function AvailableTusdc({ chip }: { chip: TusdcChip }) {
+  const label = !chip.connected
+    ? "—"
+    : chip.loading && chip.balance === null
+      ? "…"
+      : (chip.balance ?? "—");
+
+  return (
+    <Link
+      href="/faucet"
+      aria-label={
+        chip.connected && chip.balance !== null
+          ? `Available test USDC ${chip.balance}. Open faucet.`
+          : "Available test USDC. Open faucet."
+      }
+      className="radius-control inline-flex max-w-[min(100%,14rem)] shrink-0 items-center gap-2 border border-brand-muted/80 bg-brand-mist px-3 py-2 text-left shadow-soft transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      title="Get more test USDC from the faucet"
+    >
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-brand-muted/70 bg-brand-soft text-brand-ink">
+        <Droplets className="h-3.5 w-3.5" aria-hidden />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+          Available tUSDC
+        </span>
+        <span className="block truncate text-sm font-semibold tabular-nums text-foreground">
+          {label}
+        </span>
+      </span>
+    </Link>
   );
 }
