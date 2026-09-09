@@ -7,8 +7,12 @@ describe("indexer integer normalization", () => {
     assert.equal(storedIntegerMatchesChainValue("31645569620253164", "31645569620253164"), true);
   });
 
-  it("matches PostgREST numeric values returned as numbers", () => {
-    assert.equal(storedIntegerMatchesChainValue(31645569620253164, "31645569620253164"), true);
+  it("matches safely representable legacy numeric values", () => {
+    assert.equal(storedIntegerMatchesChainValue(316, "316"), true);
+  });
+
+  it("rejects unsafe PostgREST numbers that may already be rounded", () => {
+    assert.equal(storedIntegerMatchesChainValue(31645569620253164, "31645569620253164"), false);
   });
 
   it("does not match a different chain amount", () => {

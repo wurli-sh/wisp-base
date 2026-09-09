@@ -36,7 +36,10 @@ export function storedIntegerMatchesChainValue(
 ): boolean {
   if (typeof stored === "string") return stored === chainValue;
   if (typeof stored === "number") {
-    return Number.isFinite(stored) && stored === Number(chainValue);
+    // Never treat a rounded PostgREST JSON number as matching an exact chain
+    // integer. After the exact-chain-integers migration this compatibility path
+    // is only needed for safely representable values from older databases.
+    return Number.isSafeInteger(stored) && BigInt(stored).toString() === chainValue;
   }
   return String(stored) === chainValue;
 }
