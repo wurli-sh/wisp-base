@@ -21,3 +21,4 @@ apps/web/playwright-report/
 contracts/out/
 contracts/cache/
 contracts/broadcast/
+.vercel

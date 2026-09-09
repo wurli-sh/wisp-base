@@ -27,9 +27,9 @@
       "key": "WISPAAPL",
       "address": "0xB2000000000000000000002247EcF9CA88df03Ad",
       "codeHash": "0x309b8896ee4c1ff7ec1966155373dee42663b6b40c3fedc70ba501684848d2a3",
-      "routerInventory": "99998984177215189873420",
-      "escrowBalance": "0",
-      "locked": "0"
+      "routerInventory": "99998917721518987341776",
+      "escrowBalance": "31645569620253164",
+      "locked": "31645569620253164"
     },
     {
       "key": "WISPNVDA",
